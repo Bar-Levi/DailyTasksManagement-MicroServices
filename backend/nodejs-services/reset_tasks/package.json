@@ -1,0 +1,14 @@
+{
+  "name": "reset_tasks",
+  "version": "1.0.0",
+  "description": "Node.js service for resetting tasks",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^5.5.0",
+    "cors": "^2.8.5"
+  }
+}

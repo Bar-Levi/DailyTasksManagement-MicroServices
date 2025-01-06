@@ -1,0 +1,122 @@
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: local_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  add_task:
+    build:
+      context: ./backend/add_task
+    container_name: add_task_service
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+  remove_task:
+    build:
+      context: ./backend/remove_task
+    container_name: remove_task_service
+    ports:
+      - "4001:4001"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+  edit_task:
+    build:
+      context: ./backend/edit_task
+    container_name: edit_task_service
+    ports:
+      - "4002:4002"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+  mark_done:
+    build:
+      context: ./backend/mark_done
+    container_name: mark_done_service
+    ports:
+      - "4003:4003"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+  get_tasks:
+    build:
+      context: ./backend/get_tasks
+    container_name: get_tasks_service
+    ports:
+      - "4004:4004"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+
+  search_task:
+    build:
+      context: ./backend/search_task
+    container_name: search_task_service
+    ports:
+      - "4005:4005"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+  sort_tasks:
+    build:
+      context: ./backend/sort_tasks
+    container_name: sort_tasks_service
+    ports:
+      - "4006:4006"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+
+  reset_tasks:
+    build:
+      context: ./backend/reset_tasks
+    container_name: reset_tasks_service
+    ports:
+      - "4007:4007"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+    
+  get_tasks_nodejs:
+    build:
+      context: ./nodejs-services/get_tasks
+    container_name: get_tasks_nodejs_service
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+
+  reset_tasks_nodejs:
+    build:
+      context: ./nodejs-services/reset_tasks
+    container_name: reset_tasks_nodejs_service
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongodb
+
+
+volumes:
+  mongodb_data:
