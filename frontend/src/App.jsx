@@ -113,7 +113,7 @@ const App = () => {
                             onClick={handleResetTasks}
                             className="bg-red-500 text-white px-4 py-2 rounded-md shadow hover:bg-red-600"
                         >
-                            Reset All Tasks
+                            Delete All Tasks
                         </button>
                         <button
                             onClick={handleSortTasks}
