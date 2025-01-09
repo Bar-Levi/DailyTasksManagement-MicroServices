@@ -1,12 +1,12 @@
 import React from 'react';
 import TaskItem from './TaskItem';
 
-const TaskList = ({ tasks, onDelete, onToggleDone, onEdit }) => (
+const TaskList = ({ tasks, onDelete, onToggleDone, onEdit, onAdd }) => (
     <div className="flex flex-col gap-4 mt-6">
         {tasks.length > 0 ? (
-            tasks.map(task => (
+            tasks.map((task, index) => (
                 <TaskItem
-                    key={task._id}
+                    key={task._id || index} // Use _id if available, fallback to index
                     task={task}
                     onDelete={onDelete}
                     onToggleDone={onToggleDone}

@@ -111,3 +111,12 @@ services:
     container_name: reset_tasks_nodejs_service
     ports:
       - "5001:5001"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend_service
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true

@@ -7,7 +7,8 @@ const port = 5000;
 app.use(cors()); // Add the CORS middleware
 
 // MongoDB configuration
-const mongoUrl = "mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager";
+const mongoUrl =
+  "mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager";
 const dbName = "task_manager";
 
 let db, tasksCollection;
@@ -21,10 +22,17 @@ MongoClient.connect(mongoUrl)
   })
   .catch((err) => console.error("Failed to connect to MongoDB:", err));
 
-// Get all tasks
+// Get all tasks by username
 app.get("/tasks", async (req, res) => {
   try {
-    const tasks = await tasksCollection.find().toArray();
+    const { username } = req.query;
+
+    if (!username) {
+      return res.status(400).json({ error: "Username is required to fetch tasks" });
+    }
+
+    // Find tasks by username
+    const tasks = await tasksCollection.find({ username }).toArray();
     res.status(200).json(tasks);
   } catch (err) {
     res.status(500).json({ error: err.message });
