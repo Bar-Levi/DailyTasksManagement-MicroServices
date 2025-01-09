@@ -1,23 +1,12 @@
-
 services:
-  mongodb:
-    image: mongo:6.0
-    container_name: local_mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-
   add_task:
     build:
       context: ./backend/add_task
     container_name: add_task_service
     ports:
       - "4000:4000"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
   remove_task:
     build:
@@ -25,10 +14,8 @@ services:
     container_name: remove_task_service
     ports:
       - "4001:4001"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
   edit_task:
     build:
@@ -36,10 +23,8 @@ services:
     container_name: edit_task_service
     ports:
       - "4002:4002"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
   mark_done:
     build:
@@ -47,10 +32,8 @@ services:
     container_name: mark_done_service
     ports:
       - "4003:4003"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
   get_tasks:
     build:
@@ -58,11 +41,8 @@ services:
     container_name: get_tasks_service
     ports:
       - "4004:4004"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
-
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
   search_task:
     build:
@@ -70,10 +50,8 @@ services:
     container_name: search_task_service
     ports:
       - "4005:4005"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
   sort_tasks:
     build:
@@ -81,11 +59,8 @@ services:
     container_name: sort_tasks_service
     ports:
       - "4006:4006"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
-
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
   reset_tasks:
     build:
@@ -93,20 +68,42 @@ services:
     container_name: reset_tasks_service
     ports:
       - "4007:4007"
-    depends_on:
-      - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
 
-    
+  register:
+    build:
+      context: ./backend/register
+    container_name: register_service
+    ports:
+      - "4008:4008"
+    environment:
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
+
+  login:
+    build:
+      context: ./backend/login
+    container_name: login_service
+    ports:
+      - "4009:4009"
+    environment:
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
+
+  delete_user:
+    build:
+      context: ./backend/delete_user
+    container_name: delete_user_service
+    ports:
+      - "4010:4010"
+    environment:
+      - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
+
   get_tasks_nodejs:
     build:
       context: ./nodejs-services/get_tasks
     container_name: get_tasks_nodejs_service
     ports:
       - "5000:5000"
-    depends_on:
-      - mongodb
 
   reset_tasks_nodejs:
     build:
@@ -114,9 +111,3 @@ services:
     container_name: reset_tasks_nodejs_service
     ports:
       - "5001:5001"
-    depends_on:
-      - mongodb
-
-
-volumes:
-  mongodb_data:

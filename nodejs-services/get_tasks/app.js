@@ -7,7 +7,7 @@ const port = 5000;
 app.use(cors()); // Add the CORS middleware
 
 // MongoDB configuration
-const mongoUrl = "mongodb://mongodb:27017";
+const mongoUrl = "mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager";
 const dbName = "task_manager";
 
 let db, tasksCollection;
