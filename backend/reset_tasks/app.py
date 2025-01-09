@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)
 
 # MongoDB configuration
-client = MongoClient("mongodb://mongodb:27017/")
+client = MongoClient("mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager")
 db = client.task_manager
 tasks_collection = db.tasks
 
@@ -16,6 +16,8 @@ def reset_tasks():
         # Get username from the request body
         data = request.json
         username = data.get('username')
+        
+        print(f"Resetting tasks for username: {username}")
 
         if not username:
             return jsonify({'error': 'Username is required to reset tasks'}), 400

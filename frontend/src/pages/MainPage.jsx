@@ -54,8 +54,7 @@ const App = () => {
                 return;
             }
             const addedTask = await addTask({ ...newTask, username: currentUsername });
-            console.log("tasks added: " + addedTask)
-    
+                
             setTasks((prevTasks) => [...prevTasks, addedTask]);
         } catch (error) {
             console.error('Error adding task:', error);
