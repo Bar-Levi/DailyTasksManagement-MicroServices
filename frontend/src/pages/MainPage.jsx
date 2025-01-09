@@ -45,7 +45,7 @@ const App = () => {
         };
 
         loadTasks();
-    }, [searchQuery, sorted, currentUsername]);
+    }, [searchQuery, sorted, currentUsername, tasks]);
 
     const handleAddTask = async (newTask) => {
         try {
