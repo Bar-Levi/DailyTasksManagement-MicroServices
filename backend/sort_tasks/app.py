@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from pymongo import MongoClient
 from datetime import datetime
 from flask_cors import CORS
@@ -14,8 +14,14 @@ tasks_collection = db.tasks
 @app.route('/sort_tasks', methods=['GET'])
 def sort_tasks():
     try:
-        # Fetch all tasks
-        tasks = list(tasks_collection.find())
+        # Get username from query parameters
+        username = request.args.get('username')
+
+        if not username:
+            return jsonify({'error': 'Username is required to sort tasks'}), 400
+
+        # Fetch tasks for the given username
+        tasks = list(tasks_collection.find({'username': username}))
 
         # Convert 'due_hour' to datetime and sort
         for task in tasks:

@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+
+from flask import Flask, jsonify, request
 from pymongo import MongoClient
 from flask_cors import CORS
 
@@ -13,18 +14,20 @@ tasks_collection = db.tasks
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
     try:
-        tasks = list(tasks_collection.find())
+        # Get the username from the query parameters
+        username = request.args.get('username')
+
+        if not username:
+            return jsonify({'error': 'Username is required'}), 400
+
+        # Fetch tasks for the given username
+        tasks = list(tasks_collection.find({'username': username}))
         for task in tasks:
             task['_id'] = str(task['_id'])  # Convert ObjectId to string
+
         return jsonify(tasks), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-@app.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({'status': 'alive'}), 200
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4004)

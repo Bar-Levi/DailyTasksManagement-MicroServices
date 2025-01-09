@@ -1,14 +1,30 @@
 import React, { useState } from 'react';
 
-const AddTaskForm = ({ onAdd }) => {
+const AddTaskForm = ({ onAdd, username }) => {
     const [taskName, setTaskName] = useState('');
     const [dueHour, setDueHour] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onAdd({ task_name: taskName, due_hour: dueHour, is_done: false });
-        setTaskName('');
-        setDueHour('');
+
+        // המשימה החדשה שתתווסף עם username
+        const newTask = {
+            task_name: taskName,
+            due_hour: dueHour,
+            is_done: false,
+            username, // הוספת שדה username
+        };
+
+        try {
+            // קריאה לפונקציה שמוסיפה משימה ומחזירה את המשימה המלאה
+            await onAdd(newTask);
+
+            // איפוס השדות לאחר ההוספה
+            setTaskName('');
+            setDueHour('');
+        } catch (error) {
+            console.error('Error adding task:', error);
+        }
     };
 
     return (

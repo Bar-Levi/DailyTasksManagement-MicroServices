@@ -5,8 +5,8 @@ from app import app, set_db
 # Mock MongoDB connection
 @pytest.fixture(autouse=True)
 def mock_mongo():
-    with mongomock.patch(servers=("mongodb://mongodb:27017/",)):
-        mock_client = mongomock.MongoClient("mongodb://mongodb:27017/")
+    with mongomock.patch(servers=("mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager",)):
+        mock_client = mongomock.MongoClient("mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager")
         mock_db = mock_client.task_manager
         set_db(mock_db)  # Inject the mock database
         yield

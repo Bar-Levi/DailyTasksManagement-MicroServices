@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { fetchTasks, addTask, markDone, deleteTask, editTask, resetTasks, searchTasks, sortTasks } from '../api';
+import {
+    fetchTasks,
+    addTask,
+    markDone,
+    deleteTask,
+    editTask,
+    resetTasks,
+    searchTasks,
+    sortTasks,
+} from '../api';
 import TaskList from '../components/TaskList';
 import AddTaskForm from '../components/AddTaskForm';
 import { useLocation } from 'react-router-dom';
@@ -7,32 +16,27 @@ import { useLocation } from 'react-router-dom';
 const App = () => {
     const [tasks, setTasks] = useState([]);
     const [searchQuery, setSearchQuery] = useState({ task_name: '', due_hour: '' });
-    const [sorted, setSorted] = useState(false); // New state to track if the tasks are sorted
-    const [unrender, setUnrender] = useState(false); // New state to track if the tasks are sorted
+    const [sorted, setSorted] = useState(false);
     const { state } = useLocation();
-    const currentUsername = state?.user.username || "";
-    console.log("Current username: " + currentUsername);
+    const currentUsername = state?.user?.username || '';
 
     useEffect(() => {
         const loadTasks = async () => {
-            console.log('Loading tasks');
             try {
-                if(unrender)
-                    setUnrender(false);
-                else if (sorted) {
-                    setUnrender(true);
-                    const sortedTasks = await sortTasks();
+                if (!currentUsername) {
+                    console.error('Username is required to load tasks.');
+                    return;
+                }
+
+                if (sorted) {
+                    const sortedTasks = await sortTasks(currentUsername);
                     setTasks(sortedTasks);
-                    console.log('Sorted');
                 } else if (searchQuery.task_name || searchQuery.due_hour) {
-                    setUnrender(true);
                     const { task_name, due_hour } = searchQuery;
-                    const filteredTasks = await searchTasks(task_name, due_hour);
+                    const filteredTasks = await searchTasks(task_name, due_hour, currentUsername);
                     setTasks(filteredTasks || []);
-                } else if (!sorted) {
-                    setUnrender(true);
-                    // Fetch only if not sorted
-                    const data = await fetchTasks();
+                } else {
+                    const data = await fetchTasks(currentUsername);
                     setTasks(data || []);
                 }
             } catch (error) {
@@ -41,39 +45,64 @@ const App = () => {
         };
 
         loadTasks();
-    }, [tasks, searchQuery, sorted]);
+    }, [searchQuery, sorted, currentUsername, tasks]);
 
     const handleAddTask = async (newTask) => {
-        const addedTask = await addTask(newTask);
-        setTasks([...tasks, addedTask]);
+        try {
+            if (!currentUsername) {
+                console.error('Username is required to add a task.');
+                return;
+            }
+            const addedTask = await addTask({ ...newTask, username: currentUsername });
+                
+            setTasks((prevTasks) => [...prevTasks, addedTask]);
+        } catch (error) {
+            console.error('Error adding task:', error);
+        }
     };
 
     const handleDeleteTask = async (id) => {
-        await deleteTask(id);
-        setTasks(tasks.filter(task => task._id !== id));
+        try {
+            await deleteTask(id);
+            setTasks(tasks.filter((task) => task._id !== id));
+        } catch (error) {
+            console.error('Error deleting task:', error);
+        }
     };
 
     const handleToggleDone = async (id) => {
-        const task = tasks.find(task => task._id === id);
-        const updatedTask = await markDone(id, { is_done: !task.is_done });
-        setTasks(tasks.map(t => (t._id === id ? updatedTask : t)));
+        try {
+            const task = tasks.find((task) => task._id === id);
+            const updatedTask = await markDone(id, { is_done: !task.is_done });
+            setTasks(tasks.map((t) => (t._id === id ? updatedTask : t)));
+        } catch (error) {
+            console.error('Error toggling task status:', error);
+        }
     };
 
     const handleEditTask = async (id, updates) => {
-        const updatedTask = await editTask(id, updates);
-        setTasks(tasks.map(t => (t._id === id ? updatedTask : t)));
+        try {
+            const updatedTask = await editTask(id, updates);
+            setTasks(tasks.map((t) => (t._id === id ? updatedTask : t)));
+        } catch (error) {
+            console.error('Error editing task:', error);
+        }
     };
 
     const handleResetTasks = async () => {
-        await resetTasks();
-        setTasks([]);
-        setSorted(false); // Reset sorted flag
+        try {
+            await resetTasks(currentUsername);
+            setTasks([]);
+            setSorted(false);
+        } catch (error) {
+            console.error('Error resetting tasks:', error);
+        }
     };
 
     const handleSortTasks = async () => {
         try {
             setSearchQuery({ task_name: '', due_hour: '' });
-            setSorted(true); // Set sorted flag
+            setSorted(true);
         } catch (error) {
             console.error('Error sorting tasks:', error);
         }
@@ -81,17 +110,14 @@ const App = () => {
 
     const handleDeleteUser = async () => {
         try {
-            const response = await fetch('http://localhost:4010/delete_user', { // Use the correct endpoint
+            const response = await fetch('http://localhost:4010/delete_user', {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: state?.user.username }), // Send the username as JSON
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUsername }),
             });
-    
+
             if (response.ok) {
                 alert('User deleted successfully');
-                // Redirect the user to a login page or home page after deletion
                 window.location.href = '/';
             } else {
                 const errorData = await response.json();
@@ -103,10 +129,9 @@ const App = () => {
         }
     };
 
-    
     const updateSearchQuery = (key, value) => {
         setSearchQuery({ ...searchQuery, [key]: value });
-        setSorted(false); // Reset sorted flag when a search query is updated
+        setSorted(false);
     };
 
     return (
@@ -166,7 +191,7 @@ const App = () => {
                         </button>
                     </div>
                 </div>
-                <AddTaskForm onAdd={handleAddTask} />
+                <AddTaskForm onAdd={handleAddTask} username={currentUsername} />
                 <TaskList
                     tasks={tasks}
                     onDelete={handleDeleteTask}

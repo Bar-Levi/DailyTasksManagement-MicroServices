@@ -14,11 +14,15 @@ tasks_collection = db.tasks
 def search_task():
     try:
         # Get query parameters
+        username = request.args.get('username')  # Get username from query params
         task_name = request.args.get('task_name')
         due_hour = request.args.get('due_hour')
 
+        if not username:
+            return jsonify({'error': 'Username is required to search tasks'}), 400
+
         # Build the query dynamically
-        query = {}
+        query = {'username': username}  # Include username in the query
         if task_name:
             query['task_name'] = {'$regex': task_name, '$options': 'i'}  # Case-insensitive search
         if due_hour:
