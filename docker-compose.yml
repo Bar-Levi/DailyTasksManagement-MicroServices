@@ -124,8 +124,33 @@ services:
       context: ./nodejs-services/reset_tasks
     container_name: reset_tasks_nodejs_service
     ports:
-      - "5001:5001"
+      - "5001:5000"
     restart: always
+
+  analyze_tasks:
+    build:
+      context: ./backend/analyze_tasks
+    container_name: analyze_tasks_service
+    ports:
+      - "5002:5000"
+    restart: always
+
+  share_tasks:
+    build:
+      context: ./backend/share_tasks
+    container_name: share_tasks_service
+    ports:
+      - "5003:5000"
+    restart: always
+
+  sync_tasks:
+    build:
+      context: ./backend/sync_tasks
+    container_name: sync_tasks_service
+    ports:
+      - "5004:5000"
+    restart: always
+
 
   frontend:
     build:
