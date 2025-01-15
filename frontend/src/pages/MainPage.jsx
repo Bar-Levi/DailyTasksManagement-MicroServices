@@ -19,6 +19,12 @@ const App = () => {
     const [sorted, setSorted] = useState(false);
     const { state } = useLocation();
     const currentUsername = state?.user?.username || '';
+    const [mockResponses, setMockResponses] = useState({
+        analyzeTasks: null,
+        shareTasks: null,
+        syncTasks: null,
+    });
+    
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -129,6 +135,22 @@ const App = () => {
         }
     };
 
+    const handleMockClick = async (service) => {
+        try {
+            const response = await fetch(`http://localhost:${service}`, { method: 'GET' });
+            if (response.ok) {
+                const data = await response.json();
+                setMockResponses((prev) => ({ ...prev, [service]: data.message }));
+            } else {
+                setMockResponses((prev) => ({ ...prev, [service]: 'Error fetching data' }));
+            }
+        } catch (error) {
+            console.error('Error calling mock service:', error);
+            setMockResponses((prev) => ({ ...prev, [service]: 'Error calling service' }));
+        }
+    };
+    
+
     const updateSearchQuery = (key, value) => {
         setSearchQuery({ ...searchQuery, [key]: value });
         setSorted(false);
@@ -136,7 +158,7 @@ const App = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+            <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6">
                 <h1 className="text-3xl font-bold text-center text-gray-800">Task Manager</h1>
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-4 sm:space-y-0">
                     <div className="flex flex-col space-y-2 mb-4">
@@ -161,7 +183,7 @@ const App = () => {
                             *Tasks will automatically update as you type in the search fields.
                         </p>
                     </div>
-
+    
                     <div className="flex space-x-2 items-center">
                         <button
                             onClick={handleResetTasks}
@@ -189,6 +211,33 @@ const App = () => {
                         >
                             Delete User
                         </button>
+                        <button
+                            onClick={async () => {
+                                await handleMockClick('5002');
+                                alert(`This is a future service: analyze_tasks`);
+                            }}
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            Analyze Tasks
+                        </button>
+                        <button
+                            onClick={async () => {
+                                await handleMockClick('5003');
+                                alert(`This is a future service: share_tasks`);
+                            }}
+                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                            Share Tasks
+                        </button>
+                        <button
+                            onClick={async () => {
+                                await handleMockClick('5004');
+                                alert(`This is a future service: sync_tasks Google Calendar`);
+                            }}
+                            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                        >
+                            Sync Tasks
+                        </button>
                     </div>
                 </div>
                 <AddTaskForm onAdd={handleAddTask} username={currentUsername} />
@@ -201,6 +250,8 @@ const App = () => {
             </div>
         </div>
     );
+    
+    
 };
 
 export default App;
