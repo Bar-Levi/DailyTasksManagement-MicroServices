@@ -28,6 +28,11 @@ def register_user():
         return jsonify({'message': 'User registered successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+# Helper function for testing to set a custom database
+def set_db(database):
+    global tasks_collection
+    tasks_collection = database.tasks
 
 
 if __name__ == '__main__':

@@ -15,6 +15,7 @@ users_collection = db.users
 def login_user():
     try:
         data = request.json
+        print("data: ", data)
         username = data.get('username')
         password = data.get('password')
 
@@ -28,7 +29,11 @@ def login_user():
         return jsonify({'message': 'Login successful'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+    
+# Helper function for testing to set a custom database
+def set_db(database):
+    global tasks_collection
+    tasks_collection = database.tasks
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4009)
