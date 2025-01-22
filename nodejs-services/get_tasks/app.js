@@ -1,28 +1,28 @@
 const express = require("express");
 const { MongoClient } = require("mongodb");
-const cors = require("cors"); // Import cors
+const cors = require("cors");
 
 const app = express();
 const port = 5000;
-app.use(cors()); // Add the CORS middleware
 
-// MongoDB configuration
-const mongoUrl =
-  "mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager";
-const dbName = "task_manager";
+app.use(cors());
 
-let db, tasksCollection;
+let tasksCollection;
 
-// Connect to MongoDB
-MongoClient.connect(mongoUrl)
-  .then((client) => {
-    db = client.db(dbName);
-    tasksCollection = db.collection("tasks");
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => console.error("Failed to connect to MongoDB:", err));
+// MongoDB connection setup
+async function connectToDatabase(mongoUrl, dbName) {
+  const client = await MongoClient.connect(mongoUrl);
+  const db = client.db(dbName);
+  tasksCollection = db.collection("tasks");
+  console.log("Connected to MongoDB");
+}
 
-// Get all tasks by username
+// Allow injecting a custom tasksCollection for tests
+function setTasksCollection(mockCollection) {
+  tasksCollection = mockCollection;
+}
+
+// Routes
 app.get("/tasks", async (req, res) => {
   try {
     const { username } = req.query;
@@ -31,7 +31,6 @@ app.get("/tasks", async (req, res) => {
       return res.status(400).json({ error: "Username is required to fetch tasks" });
     }
 
-    // Find tasks by username
     const tasks = await tasksCollection.find({ username }).toArray();
     res.status(200).json(tasks);
   } catch (err) {
@@ -39,12 +38,20 @@ app.get("/tasks", async (req, res) => {
   }
 });
 
-// Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "alive" });
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`get_tasks service running on port ${port}`);
-});
+// Start server only if script is executed directly
+if (require.main === module) {
+  const mongoUrl =
+    "mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager";
+  const dbName = "task_manager";
+  connectToDatabase(mongoUrl, dbName).then(() => {
+    app.listen(port, () => {
+      console.log(`get_tasks service running on port ${port}`);
+    });
+  });
+}
+
+module.exports = { app, setTasksCollection };
