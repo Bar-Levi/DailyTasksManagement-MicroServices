@@ -31,8 +31,9 @@ def register_user():
     
 # Helper function for testing to set a custom database
 def set_db(database):
-    global tasks_collection
-    tasks_collection = database.tasks
+    global users_collection
+    users_collection = database.users
+
 
 
 if __name__ == '__main__':

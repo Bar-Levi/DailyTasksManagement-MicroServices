@@ -29,6 +29,11 @@ def remove_task(task_id):
 def health_check():
     return jsonify({'status': 'alive'}), 200
 
+# Helper function for testing to set a custom database
+def set_db(database):
+    global tasks_collection
+    tasks_collection = database.tasks
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4001)
