@@ -10,6 +10,9 @@ client = MongoClient("mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.q
 db = client.task_manager
 users_collection = db.users
 
+@app.route('/')
+def hello():
+    return 'Hello'
 
 @app.route('/register', methods=['POST'])
 def register_user():
@@ -18,6 +21,7 @@ def register_user():
         username = data.get('username')
         password = data.get('password')
 
+        print(username, password)
         if not username or not password:
             return jsonify({'error': 'Username and password are required'}), 400
 
