@@ -98,7 +98,7 @@ const TaskItem = ({ task, onDelete, onToggleDone, onEdit }) => {
                         </button>
                         <button
                             onClick={() => onToggleDone(task._id)}
-                            data-cy={`toggle-done-button-${task.task_name.replace(' ', '-').lower()}`} // Cypress selector for toggle done button
+                            data-cy={`toggle-done-button-${task.task_name.replace(' ', '-').toLowerCase()}`} // Cypress selector for toggle done button
                             className={`px-4 py-2 text-sm font-medium rounded-md ${
                                 task.is_done
                                     ? 'bg-gray-400 text-white hover:bg-gray-500'
