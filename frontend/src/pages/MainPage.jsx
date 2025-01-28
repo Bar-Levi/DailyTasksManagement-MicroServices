@@ -19,11 +19,6 @@ const App = () => {
     const [sorted, setSorted] = useState(false);
     const { state } = useLocation();
     const currentUsername = state?.user?.username || '';
-    const [mockResponses, setMockResponses] = useState({
-        analyzeTasks: null,
-        shareTasks: null,
-        syncTasks: null,
-    });
     const [shouldRefetch, setShouldRefetch] = useState(false);
 
     useEffect(() => {
@@ -61,7 +56,7 @@ const App = () => {
                 console.error('Username is required to add a task.');
                 return;
             }
-            const addedTask = await addTask({ ...newTask, username: currentUsername });
+            await addTask({ ...newTask, username: currentUsername });
             // Instead of directly updating the tasks state
             setShouldRefetch(true);  // Trigger a refetch
         } catch (error) {
@@ -143,12 +138,12 @@ const App = () => {
             const response = await fetch(`http://localhost:${service}`, { method: 'GET' });
             if (response.ok) {
                 const data = await response.json();
-                setMockResponses((prev) => ({ ...prev, [service]: data.message }));
+                alert(data.message);
             } else {
-                setMockResponses((prev) => ({ ...prev, [service]: 'Error fetching data' }));
+                alert('Error fetching data');
             }
         } catch (error) {
-            setMockResponses((prev) => ({ ...prev, [service]: 'Error calling service' }));
+            alert('Error fetching data');
         }
     };
 
@@ -215,8 +210,8 @@ const App = () => {
                         </button>
                         <button
                             onClick={async () => {
-                                await handleMockClick('5002');
-                                alert(`This is a future service: analyze_tasks`);
+                                await handleMockClick('5002/analyze');
+                                //alert(`This is a future service: analyze_tasks`);
                             }}
                             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                         >
@@ -224,8 +219,8 @@ const App = () => {
                         </button>
                         <button
                             onClick={async () => {
-                                await handleMockClick('5003');
-                                alert(`This is a future service: share_tasks`);
+                                await handleMockClick('5003/share');
+                                //alert(`This is a future service: share_tasks`);
                             }}
                             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                         >
@@ -233,8 +228,8 @@ const App = () => {
                         </button>
                         <button
                             onClick={async () => {
-                                await handleMockClick('5004');
-                                alert(`This is a future service: sync_tasks Google Calendar`);
+                                await handleMockClick('5004/sync');
+                                //alert(`This is a future service: sync_tasks Google Calendar`);
                             }}
                             className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                         >

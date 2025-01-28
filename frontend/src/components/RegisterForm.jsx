@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import Swal from 'sweetalert2';
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [message, setMessage] = useState(null);
     const navigate = useNavigate(); // Initialize useNavigate
-    const { state } = useLocation();
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });

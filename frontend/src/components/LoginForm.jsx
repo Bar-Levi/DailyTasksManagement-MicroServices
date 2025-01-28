@@ -1,11 +1,10 @@
 import React, { useState} from 'react';
-import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const LoginForm = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [message, setMessage] = useState(null);
     const navigate = useNavigate(); // Initialize useNavigate
-    const { state } = useLocation(); // Initial
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
