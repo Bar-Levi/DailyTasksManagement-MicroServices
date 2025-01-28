@@ -49,7 +49,7 @@ const App = () => {
                 console.error('Error loading tasks:', error);
             }
         };
-        
+
         loadTasks();
     }, [searchQuery, sorted, currentUsername, tasks]);
 
@@ -145,7 +145,6 @@ const App = () => {
                 setMockResponses((prev) => ({ ...prev, [service]: 'Error fetching data' }));
             }
         } catch (error) {
-            console.error('Error calling mock service:', error);
             setMockResponses((prev) => ({ ...prev, [service]: 'Error calling service' }));
         }
     };
