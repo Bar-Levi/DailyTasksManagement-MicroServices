@@ -24,7 +24,7 @@ const App = () => {
         shareTasks: null,
         syncTasks: null,
     });
-    
+    const [shouldRefetch, setShouldRefetch] = useState(false);
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -33,25 +33,27 @@ const App = () => {
                     console.error('Username is required to load tasks.');
                     return;
                 }
-
+                
+                let updatedTasks;
                 if (sorted) {
-                    const sortedTasks = await sortTasks(currentUsername);
-                    setTasks(sortedTasks);
+                    console.log(`Sorting tasks for `, currentUsername);
+                    updatedTasks = await sortTasks(currentUsername);
                 } else if (searchQuery.task_name || searchQuery.due_hour) {
                     const { task_name, due_hour } = searchQuery;
-                    const filteredTasks = await searchTasks(task_name, due_hour, currentUsername);
-                    setTasks(filteredTasks || []);
+                    updatedTasks = await searchTasks(task_name, due_hour, currentUsername) || [];
                 } else {
-                    const data = await fetchTasks(currentUsername);
-                    setTasks(data || []);
+                    console.log("Fetching tasks for ", currentUsername);
+                    updatedTasks = await fetchTasks(currentUsername) || [];
                 }
+                setTasks(updatedTasks);
+                setShouldRefetch(false);  // Reset the refetch flag
             } catch (error) {
                 console.error('Error loading tasks:', error);
             }
         };
 
         loadTasks();
-    }, [searchQuery, sorted, currentUsername, tasks]);
+    }, [searchQuery, sorted, currentUsername, shouldRefetch]);  // Add shouldRefetch to dependencies
 
     const handleAddTask = async (newTask) => {
         try {
@@ -60,8 +62,8 @@ const App = () => {
                 return;
             }
             const addedTask = await addTask({ ...newTask, username: currentUsername });
-                
-            setTasks((prevTasks) => [...prevTasks, addedTask]);
+            // Instead of directly updating the tasks state
+            setShouldRefetch(true);  // Trigger a refetch
         } catch (error) {
             console.error('Error adding task:', error);
         }
@@ -70,7 +72,7 @@ const App = () => {
     const handleDeleteTask = async (id) => {
         try {
             await deleteTask(id);
-            setTasks(tasks.filter((task) => task._id !== id));
+            setShouldRefetch(true);  // Trigger a refetch
         } catch (error) {
             console.error('Error deleting task:', error);
         }
@@ -79,8 +81,8 @@ const App = () => {
     const handleToggleDone = async (id) => {
         try {
             const task = tasks.find((task) => task._id === id);
-            const updatedTask = await markDone(id, { is_done: !task.is_done });
-            setTasks(tasks.map((t) => (t._id === id ? updatedTask : t)));
+            await markDone(id, { is_done: !task.is_done });
+            setShouldRefetch(true);  // Trigger a refetch
         } catch (error) {
             console.error('Error toggling task status:', error);
         }
@@ -88,8 +90,8 @@ const App = () => {
 
     const handleEditTask = async (id, updates) => {
         try {
-            const updatedTask = await editTask(id, updates);
-            setTasks(tasks.map((t) => (t._id === id ? updatedTask : t)));
+            await editTask(id, updates);
+            setShouldRefetch(true);  // Trigger a refetch
         } catch (error) {
             console.error('Error editing task:', error);
         }
@@ -100,6 +102,7 @@ const App = () => {
             await resetTasks(currentUsername);
             setTasks([]);
             setSorted(false);
+            setShouldRefetch(true);  // Trigger a refetch
         } catch (error) {
             console.error('Error resetting tasks:', error);
         }
@@ -148,7 +151,6 @@ const App = () => {
             setMockResponses((prev) => ({ ...prev, [service]: 'Error calling service' }));
         }
     };
-    
 
     const updateSearchQuery = (key, value) => {
         setSearchQuery({ ...searchQuery, [key]: value });
@@ -250,8 +252,6 @@ const App = () => {
             </div>
         </div>
     );
-    
-    
 };
 
 export default App;
