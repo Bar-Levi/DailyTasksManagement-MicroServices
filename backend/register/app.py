@@ -25,6 +25,10 @@ def register_user():
         if not username or not password:
             return jsonify({'error': 'Username and password are required'}), 400
 
+        # Check if password meets minimum length requirement
+        if len(password) < 8:
+            return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+
         if users_collection.find_one({'username': username}):
             return jsonify({'error': 'Username already exists'}), 400
 
@@ -32,7 +36,7 @@ def register_user():
         return jsonify({'message': 'User registered successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
 # Helper function for testing to set a custom database
 def set_db(database):
     global users_collection

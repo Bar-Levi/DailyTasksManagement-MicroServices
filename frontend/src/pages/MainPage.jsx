@@ -49,7 +49,7 @@ const App = () => {
                 console.error('Error loading tasks:', error);
             }
         };
-
+        
         loadTasks();
     }, [searchQuery, sorted, currentUsername, tasks]);
 

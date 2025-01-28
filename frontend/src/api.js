@@ -77,13 +77,13 @@ export async function fetchTasks(username) {
         console.error("Failed to fetch from port 4004");
 
         try {
-            // Fallback to port 5000 with username query
-            const response = await fetch(`http://localhost:5000/tasks?username=${username}`);
-            if (!response.ok) throw new Error(`Error from port 5000: ${response.statusText}`);
+            // Fallback to port 5007 with username query
+            const response = await fetch(`http://localhost:5007/tasks?username=${username}`);
+            if (!response.ok) throw new Error(`Error from port 5007: ${response.statusText}`);
             return await response.json();
         } catch (err) {
-            console.error("Failed to fetch from port 5000.");
-            throw new Error("Unable to fetch tasks from both ports 4004 and 5000");
+            console.error("Failed to fetch from port 5007.");
+            throw new Error("Unable to fetch tasks from both ports 4004 and 5007");
         }
     }
 }

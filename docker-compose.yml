@@ -48,7 +48,7 @@ services:
       - "4004:4004"
     environment:
       - MONGO_URI=mongodb+srv://ronybubnovsky:UX4st2u29gvKGqbu@taskmanager.qjg5t.mongodb.net/?retryWrites=true&w=majority&appName=TaskManager
-    restart: always
+    # restart: always
 
   search_task:
     build:

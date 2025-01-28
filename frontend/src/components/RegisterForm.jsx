@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
+import Swal from 'sweetalert2';
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
@@ -10,6 +11,7 @@ const RegisterForm = () => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,16 +26,29 @@ const RegisterForm = () => {
 
             const data = await response.json();
             if (response.ok) {
-                setMessage({ type: 'success', text: data.message });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message,
+                });
                 navigate('/mainPage', {
                     state: {
                         user: formData,
                     },
-                }); // Navigate to /mainPage on successful login            } else {
-                setMessage({ type: 'error', text: data.error });
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.error,
+                });
             }
         } catch (error) {
-            setMessage({ type: 'error', text: 'Something went wrong. Please try again later.' });
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again later.',
+            });
         }
     };
 
