@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     fetchTasks,
     addTask,
@@ -19,36 +19,40 @@ const App = () => {
     const [sorted, setSorted] = useState(false);
     const { state } = useLocation();
     const currentUsername = state?.user?.username || '';
-    const [shouldRefetch, setShouldRefetch] = useState(false);
+    const fetchInProgress = useRef(false);
+
+    const loadTasks = useCallback(async () => {
+        if (fetchInProgress.current) return;
+        
+        try {
+            fetchInProgress.current = true;
+            
+            if (!currentUsername) {
+                console.error('Username is required to load tasks.');
+                return;
+            }
+            
+            let updatedTasks;
+            if (sorted) {
+                updatedTasks = await sortTasks(currentUsername);
+            } else if (searchQuery.task_name || searchQuery.due_hour) {
+                const { task_name, due_hour } = searchQuery;
+                updatedTasks = await searchTasks(task_name, due_hour, currentUsername) || [];
+            } else {
+                updatedTasks = await fetchTasks(currentUsername) || [];
+            }
+            
+            setTasks(updatedTasks);
+        } catch (error) {
+            console.error('Error loading tasks:', error);
+        } finally {
+            fetchInProgress.current = false;
+        }
+    }, [currentUsername, searchQuery, sorted]);
 
     useEffect(() => {
-        const loadTasks = async () => {
-            try {
-                if (!currentUsername) {
-                    console.error('Username is required to load tasks.');
-                    return;
-                }
-                
-                let updatedTasks;
-                if (sorted) {
-                    console.log(`Sorting tasks for `, currentUsername);
-                    updatedTasks = await sortTasks(currentUsername);
-                } else if (searchQuery.task_name || searchQuery.due_hour) {
-                    const { task_name, due_hour } = searchQuery;
-                    updatedTasks = await searchTasks(task_name, due_hour, currentUsername) || [];
-                } else {
-                    console.log("Fetching tasks for ", currentUsername);
-                    updatedTasks = await fetchTasks(currentUsername) || [];
-                }
-                setTasks(updatedTasks);
-                setShouldRefetch(false);  // Reset the refetch flag
-            } catch (error) {
-                console.error('Error loading tasks:', error);
-            }
-        };
-
         loadTasks();
-    }, [searchQuery, sorted, currentUsername, shouldRefetch]);  // Add shouldRefetch to dependencies
+    }, [loadTasks]);
 
     const handleAddTask = async (newTask) => {
         try {
@@ -57,8 +61,7 @@ const App = () => {
                 return;
             }
             await addTask({ ...newTask, username: currentUsername });
-            // Instead of directly updating the tasks state
-            setShouldRefetch(true);  // Trigger a refetch
+            await loadTasks();  // Direct refetch after mutation
         } catch (error) {
             console.error('Error adding task:', error);
         }
@@ -67,7 +70,7 @@ const App = () => {
     const handleDeleteTask = async (id) => {
         try {
             await deleteTask(id);
-            setShouldRefetch(true);  // Trigger a refetch
+            await loadTasks();  // Direct refetch after mutation
         } catch (error) {
             console.error('Error deleting task:', error);
         }
@@ -77,7 +80,7 @@ const App = () => {
         try {
             const task = tasks.find((task) => task._id === id);
             await markDone(id, { is_done: !task.is_done });
-            setShouldRefetch(true);  // Trigger a refetch
+            await loadTasks();  // Direct refetch after mutation
         } catch (error) {
             console.error('Error toggling task status:', error);
         }
@@ -86,7 +89,7 @@ const App = () => {
     const handleEditTask = async (id, updates) => {
         try {
             await editTask(id, updates);
-            setShouldRefetch(true);  // Trigger a refetch
+            await loadTasks();  // Direct refetch after mutation
         } catch (error) {
             console.error('Error editing task:', error);
         }
@@ -95,9 +98,8 @@ const App = () => {
     const handleResetTasks = async () => {
         try {
             await resetTasks(currentUsername);
-            setTasks([]);
             setSorted(false);
-            setShouldRefetch(true);  // Trigger a refetch
+            await loadTasks();  // Direct refetch after mutation
         } catch (error) {
             console.error('Error resetting tasks:', error);
         }
@@ -148,7 +150,7 @@ const App = () => {
     };
 
     const updateSearchQuery = (key, value) => {
-        setSearchQuery({ ...searchQuery, [key]: value });
+        setSearchQuery(prev => ({ ...prev, [key]: value }));
         setSorted(false);
     };
 
@@ -211,7 +213,6 @@ const App = () => {
                         <button
                             onClick={async () => {
                                 await handleMockClick('5002/analyze');
-                                //alert(`This is a future service: analyze_tasks`);
                             }}
                             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                         >
@@ -220,7 +221,6 @@ const App = () => {
                         <button
                             onClick={async () => {
                                 await handleMockClick('5003/share');
-                                //alert(`This is a future service: share_tasks`);
                             }}
                             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                         >
@@ -229,7 +229,6 @@ const App = () => {
                         <button
                             onClick={async () => {
                                 await handleMockClick('5004/sync');
-                                //alert(`This is a future service: sync_tasks Google Calendar`);
                             }}
                             className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                         >
