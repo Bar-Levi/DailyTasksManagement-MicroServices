@@ -6,7 +6,7 @@ const TaskList = ({ tasks, onDelete, onToggleDone, onEdit, onAdd }) => (
         {tasks.length > 0 ? (
             tasks.map((task, index) => (
                 <TaskItem
-                    key={task._id} // Use _id if available, fallback to index
+                    key={task._id || `task-${index}`} // Fallback to index if _id is unavailable
                     task={task}
                     onDelete={onDelete}
                     onToggleDone={onToggleDone}
